@@ -3,6 +3,8 @@ package com.example.vov4ik.quotes;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -89,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         QuotesKeeper qk = new QuotesKeeper();
-        List<Quotes> foundList = qk.getQuotesList();
-        mixedQuotesList = randomQuote(foundList);
+        List<Quotes> list = qk.getQuotesList(getApplicationContext());
+        mixedQuotesList = randomQuote(list);
 
     }
 
@@ -112,11 +114,7 @@ public class MainActivity extends AppCompatActivity {
         private String savedAuthor;
         private String[] savedTags;
         private Quotes quote;
-
-        public List<Quotes> wholeArray(){
-            QuotesKeeper qk = new QuotesKeeper();
-            return qk.getQuotesList();
-        }
+        private DbHelper mDbHelper;
 
 
         public PlaceholderFragment() {
@@ -175,9 +173,22 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     String author = textViewAuthor.getText().toString();
+Log.d("Test", "STARTED");
+                  /*  DbHelper dbw = new DbHelper(getContext());
+                    dbw.getWritableDatabase();
+                    Log.d("Test", "db.getWritableDatabase();");
+                    SQLiteDatabase db = dbw.getWritableDatabase();
+                    Cursor cursor = db.query(DbHelper.TABLE_NAME, new String[] { DbHelper.COLOM_NAME_ID,
+                                    DbHelper.COLOM_NAME_AUTHOR, DbHelper.COLOM_NAME_QUOTE, DbHelper.COLOM_NAME_TAGS }, DbHelper.COLOM_NAME_ID + "=?",
+                            new String[] { String.valueOf(1) }, null, null, null, null);
+
+                    if (cursor != null){
+                        cursor.moveToFirst();
+                    }
+
+                    String[] contact = new String[]{(cursor.getString(0)), cursor.getString(1), cursor.getString(2)};
+Log.d("Test", String.valueOf((contact)));*/
                     startMethodNewActivity(author, "author");
-
-
                 }
             });
 
@@ -207,6 +218,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getActivity(), SecondActivity.class);
         String[] transport = {word, key};
         intent.putExtra(EXTRA_KEY_FOND, transport);
+     /* //Fill the empty database.
+        QuotesKeeper qk = new QuotesKeeper();
+        mDbHelper = new DbHelper(getActivity());
+        mDbHelper.fillData(qk.getQuotesList());*/
         startActivity(intent);
     }
 }
@@ -232,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         public int getCount() {
             // Show 3 total pages.
             QuotesKeeper qk = new QuotesKeeper();
-            return qk.getQuotesList().size();
+            return qk.getQuotesList(getApplicationContext()).size();
 
         }
 

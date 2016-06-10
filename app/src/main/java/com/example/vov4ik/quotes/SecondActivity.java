@@ -50,6 +50,7 @@ public class SecondActivity extends AppCompatActivity {
     private static String destroyPreviousFirst;
     private static String destroyPreviousSecond;
     private static List<Quotes> mixedQuotesList;
+    private DbHelper mDbHelper;
 
 
     /**
@@ -74,10 +75,6 @@ public class SecondActivity extends AppCompatActivity {
         return destroyPreviousSecond;
     }
 
-    public static void setDestroyPreviousSecond(String destroyPreviousSecond) {
-        SecondActivity.destroyPreviousSecond = destroyPreviousSecond;
-    }
-
     public static List<Quotes> getMixedQuotesList() {
         return mixedQuotesList;
     }
@@ -98,7 +95,6 @@ public class SecondActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-
         Intent intent = getIntent();
         String[] transport = intent.getStringArrayExtra(EXTRA_KEY_FOND);
         searchingWord = transport[0];
@@ -108,15 +104,14 @@ public class SecondActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
+
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
 
         QuotesKeeper qk = new QuotesKeeper();
-        List<Quotes> foundList = qk.find(searchingWord, searchingKey);
+        List<Quotes> foundList = qk.find(searchingWord, searchingKey, getApplicationContext());
         mixedQuotesList = randomQuote(foundList);
-
-
         destroyPreviousFirst = intent.getStringExtra(EXTRA_KEY_ID_FOR_FINISH_FIRST);
         destroyPreviousSecond = intent.getStringExtra(EXTRA_KEY_ID_FOR_FINISH_SECOND);
 
@@ -159,6 +154,7 @@ public class SecondActivity extends AppCompatActivity {
 
 
 
+
         public PlaceholderFragment() {
         }
 
@@ -188,7 +184,6 @@ public class SecondActivity extends AppCompatActivity {
             layout.setBackground(drawable);
 
             quote = getMixedQuotesList().get(getArguments().getInt(ARG_COUNTER));
-
             if (savedInstanceState != null) {
                 savedQuote = savedInstanceState.getString(KEY_QUOTE);
                 savedAuthor = savedInstanceState.getString(KEY_AUTHOR);
@@ -244,6 +239,7 @@ public class SecondActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             String tag = savedTags[v.getId()];
+
             startMethodNewActivity(tag, "tags");
         }
 
@@ -328,9 +324,9 @@ public class SecondActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             QuotesKeeper qk = new QuotesKeeper();
-            return qk.find(searchingWord, searchingKey).size();
+            List<Quotes> foundList = qk.find(searchingWord, searchingKey, getApplicationContext());
+            return foundList.size();
         }
 
 

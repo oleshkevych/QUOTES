@@ -1,31 +1,36 @@
 package com.example.vov4ik.quotes;
 
+import android.app.Application;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+
 
 /**
  * Created by vov4ik on 5/9/2016.
  */
-public class QuotesKeeper  {
+public class QuotesKeeper{
 
+
+    private DbHelper mDbHelper;
 
 
 
     public QuotesKeeper (){
-
     }
 
-    public List<Quotes> getQuotesList() {
-        List<Quotes> mQuotesList = new ArrayList<Quotes>();
-        //String[] tags = new String[]{"Життя", "Мотивація"};
+    public List<Quotes> getQuotesList(Context context) {
+       List<Quotes> mQuotesList = new ArrayList<Quotes>();
+       mDbHelper = new DbHelper(context);
+        mQuotesList = mDbHelper.getData();
+/*
+
+         //String[] tags = new String[]{"Життя", "Мотивація"};
 //1
         //Collections.addAll(tags, "Життя", "Мотивація");
         mQuotesList.add(new Quotes("Уінстон Черчіль", "Хочеш бути великим - приготуйся тримати відповідь за все.", new String[]{"Життя", "Мотивація"}));
@@ -70,13 +75,14 @@ public class QuotesKeeper  {
         //tags.clear();
         //Collections.addAll(tags, "Мораль", "Життя");
         mQuotesList.add(new Quotes("Фрідріх Ніцше", "Хто бореться з чудовиськами, тому слід остерігатися, щоб самому при цьому не стати чудовиськом. І якщо ти довго дивишся в безодню, то безодня теж дивиться в тебе.", new String[]{"Мораль", "Життя"}));
-
-        return mQuotesList;
+       */ return mQuotesList;
     }
 
-    public List<Quotes> find(String searchWord, String searchSection){
+
+
+    public List<Quotes> find( String searchWord, String searchSection, Context context){
         List<Quotes> finedList = new ArrayList<>();
-        List<Quotes> list = getQuotesList();
+        List<Quotes> list = getQuotesList(context);
         for (Quotes quotes :list) {
             if (Objects.equals(searchSection, "author")){
                 if (Objects.equals(quotes.getAuthor(), searchWord)){
@@ -91,6 +97,7 @@ public class QuotesKeeper  {
             }
 
         }
+
         return finedList;
     }
 
