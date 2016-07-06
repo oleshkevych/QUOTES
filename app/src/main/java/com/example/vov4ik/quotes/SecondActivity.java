@@ -51,6 +51,9 @@ public class SecondActivity extends AppCompatActivity {
     private static String destroyPreviousSecond;
     private static List<Quotes> mixedQuotesList;
     private DbHelper mDbHelper;
+    private static int lengthOfList;
+    private static String language;
+
 
 
     /**
@@ -58,6 +61,14 @@ public class SecondActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     BroadcastReceiver broadcastReceiver;
+
+    public static String getLanguage() {
+        return language;
+    }
+
+    public static void setLanguage(String language) {
+        SecondActivity.language = language;
+    }
 
     public static String getSearchingWord() {
         return searchingWord;
@@ -99,6 +110,12 @@ public class SecondActivity extends AppCompatActivity {
         String[] transport = intent.getStringArrayExtra(EXTRA_KEY_FOND);
         searchingWord = transport[0];
         searchingKey = transport[1];
+        setLanguage(transport[2]);
+        QuotesKeeper qk = new QuotesKeeper();
+        List<Quotes> foundList = qk.find(searchingWord, searchingKey, getApplicationContext(), getLanguage());
+         //= (int) new DbHelper(getApplicationContext()).getLengthOfList(getLanguage());//foundList.size();
+        mixedQuotesList = randomQuote(foundList);
+        lengthOfList = mixedQuotesList.size();
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -109,9 +126,7 @@ public class SecondActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
 
-        QuotesKeeper qk = new QuotesKeeper();
-        List<Quotes> foundList = qk.find(searchingWord, searchingKey, getApplicationContext());
-        mixedQuotesList = randomQuote(foundList);
+
         destroyPreviousFirst = intent.getStringExtra(EXTRA_KEY_ID_FOR_FINISH_FIRST);
         destroyPreviousSecond = intent.getStringExtra(EXTRA_KEY_ID_FOR_FINISH_SECOND);
 
@@ -246,7 +261,7 @@ public class SecondActivity extends AppCompatActivity {
 
         public void startMethodNewActivity(String word, String key){
             Intent intent = new Intent(getActivity(), SecondActivity.class);
-            String[] transport = {word, key};
+            String[] transport = {word, key, getLanguage()};
             intent.putExtra(EXTRA_KEY_FOND, transport);
 
             if (Objects.equals(word, getSearchingWord())){
@@ -324,9 +339,7 @@ public class SecondActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            QuotesKeeper qk = new QuotesKeeper();
-            List<Quotes> foundList = qk.find(searchingWord, searchingKey, getApplicationContext());
-            return foundList.size();
+            return lengthOfList;
         }
 
 

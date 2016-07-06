@@ -1,14 +1,11 @@
 package com.example.vov4ik.quotes;
 
-import android.app.Application;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -17,17 +14,26 @@ import java.util.Objects;
 public class QuotesKeeper{
 
 
-    private DbHelper mDbHelper;
-
 
 
     public QuotesKeeper (){
     }
 
-    public List<Quotes> getQuotesList(Context context) {
-       List<Quotes> mQuotesList = new ArrayList<Quotes>();
-       mDbHelper = new DbHelper(context);
-        mQuotesList = mDbHelper.getData();
+    public static List<Quotes> getQuotesList(Context context, String language, int startPosition) {
+        List<Quotes> mQuotesList = new ArrayList<Quotes>();
+        DbHelper mDbHelper = new DbHelper(context);
+        int lengthOfReadingInDatabase = MainActivity.getLengthOfReadingInDatabase();
+        int[] arrayOfReadingPositions = new int[lengthOfReadingInDatabase];
+        int[] mixer = MainActivity.getMixerForQuotesList();
+        if(mixer.length-startPosition<lengthOfReadingInDatabase){
+            System.arraycopy(mixer, startPosition, arrayOfReadingPositions, 0, mixer.length-startPosition);
+        }else {
+            System.arraycopy(mixer, startPosition, arrayOfReadingPositions, 0, lengthOfReadingInDatabase);
+        }
+        Log.d("Test", "mixerForQuotesList QuotesKeeper: " + Arrays.toString(arrayOfReadingPositions));
+        mQuotesList = mDbHelper.properlyDataGetterForTwoLanguages(arrayOfReadingPositions, language);
+
+
 /*
 
          //String[] tags = new String[]{"Життя", "Мотивація"};
@@ -75,30 +81,38 @@ public class QuotesKeeper{
         //tags.clear();
         //Collections.addAll(tags, "Мораль", "Життя");
         mQuotesList.add(new Quotes("Фрідріх Ніцше", "Хто бореться з чудовиськами, тому слід остерігатися, щоб самому при цьому не стати чудовиськом. І якщо ти довго дивишся в безодню, то безодня теж дивиться в тебе.", new String[]{"Мораль", "Життя"}));
-       */ return mQuotesList;
+        *///mDbHelper.fillData(mQuotesList);
+        return mQuotesList;
     }
 
 
 
-    public List<Quotes> find( String searchWord, String searchSection, Context context){
+    public List<Quotes> find( String searchWord, String searchSection, Context context, String language){
         List<Quotes> finedList = new ArrayList<>();
-        List<Quotes> list = getQuotesList(context);
-        for (Quotes quotes :list) {
-            if (Objects.equals(searchSection, "author")){
-                if (Objects.equals(quotes.getAuthor(), searchWord)){
-                    finedList.add(quotes);
-                }
-            }else{
-                for (String tag : quotes.getTags()) {
-                    if (Objects.equals(tag, searchWord)){
-                        finedList.add(quotes);
-                    }
-                }
-            }
+        DbHelper mDbHelper = new DbHelper(context);
+//        List<Quotes> list = getQuotesList(context);
+//        for (Quotes quotes :list) {
+//            if (Objects.equals(searchSection, "author")){
+//                if (Objects.equals(quotes.getAuthor(), searchWord)){
+//                    finedList.add(quotes);
+//                }
+//            }else{
+//                for (String tag : quotes.getTags()) {
+//                    if (Objects.equals(tag, searchWord)){
+//                        finedList.add(quotes);
+//                    }
+//                }
+//            }
+//
+//        }
 
-        }
+        return mDbHelper.find(searchWord, searchSection, language);//finedList;
+    }
 
-        return finedList;
+    public static int dataLength(Context context, String language){
+
+        int length = new DbHelper(context).getLengthOfList(language);
+        return length;
     }
 
 }

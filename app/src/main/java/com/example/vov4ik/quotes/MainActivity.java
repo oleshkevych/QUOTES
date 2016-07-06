@@ -1,15 +1,14 @@
 package com.example.vov4ik.quotes;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.AsyncTask;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,22 +22,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.TypeInfo;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -48,55 +42,239 @@ public class MainActivity extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
 
+    private static final String KEY_LANGUAGE = "used_language";
     private static final String KEY_QUOTE = "used_quote";
     private static final String KEY_AUTHOR = "used_author";
     private static final String KEY_TAGS = "used_tags";
     private static final String EXTRA_KEY_FOND = "com.example.vov4ik.quotesSearching_keys";
-    private static List<Quotes> mixedQuotesList;
+    private static List<Quotes> mixedQuotesList, sList;
+    private static Boolean reloader = true;
+    private static int lengthOfList;
+    private static int variableToWriteViews = 0;
+    private static int[] mixerForQuotesList;
+    private static final int lengthOfReadingInDatabase = 5;
+
+    public static int getLengthOfReadingInDatabase() {
+        return lengthOfReadingInDatabase;
+    }
+
+    public static int getVariableToWriteViews() {
+        return variableToWriteViews;
+    }
+
+    public static void setVariableToWriteViews(int variableToWriteViews) {
+        MainActivity.variableToWriteViews = variableToWriteViews;
+    }
+
+    public static void setLanguage(String language) {
+        MainActivity.language = language;
+    }
+
+    public static Boolean getReloader() {
+        return reloader;
+    }
+
+    public static void setReloader(Boolean reloader) {
+        MainActivity.reloader = reloader;
+    }
+
+    public static String getLanguage() {
+        return language;
+    }
+
+    private static String language = "mix";
+
+    public static int[] getMixerForQuotesList() {
+        return mixerForQuotesList;
+    }
+
+    public static void setMixerForQuotesList(int[] mixerForQuotesList){
+        MainActivity.mixerForQuotesList = mixerForQuotesList;
+    }
 
     public static List<Quotes> getMixedQuotesList() {
         return mixedQuotesList;
     }
 
-    public List<Quotes> randomQuote(List<Quotes> array) {
-        Random ran = new Random();
-        List<Quotes> newArray = new ArrayList<>();
-        while(array.size()>0){
-            int index = ran.nextInt(array.size());
-            newArray.add(array.get(index));
-            array.remove(index);
-        }
-        return newArray;
+    public static void setMixedQuotesList(List<Quotes> mixedQuotesList) {
+        PlaceholderFragment.setCheckingOfExecution(true);
+        MainActivity.mixedQuotesList.addAll(mixedQuotesList);
     }
+
+    public static void setLengthOfList(int lengthOfList) {
+        Random ran = new Random();
+
+        int lengthOfArray;
+        if(PlaceholderFragment.getSectionNumber()<2) {
+            lengthOfArray = lengthOfList;
+            }else{
+            lengthOfArray = lengthOfList - getMixedQuotesList().size();
+        }
+
+        int[]newArray = new int[lengthOfArray + 1];
+
+            for (int i = 1; i <= lengthOfArray; i++) {
+                newArray[i] = i;
+            }
+        int[] result = new int[lengthOfArray];
+        for (int i=0; i<lengthOfArray; i++) {
+            int index = ran.nextInt(lengthOfArray);
+            if ((newArray[index]!=0)){
+                result[i] = newArray[index];
+            }else do {
+                if ((index == lengthOfArray) && (newArray[index] == 0)) {
+                    i--;
+                    break;
+                } else {
+                    index++;
+                    if ((newArray[index] != 0)) {
+                        result[i] = newArray[index];
+                        break;
+                    }
+                }
+            }while(true);
+        }
+        setMixerForQuotesList(result);
+        MainActivity.lengthOfList = lengthOfList;
+    }
+
+    public static void refresher(SectionsPagerAdapter adapter, Context context){
+
+        Log.d("Test", "Long size: " + PlaceholderFragment.getSectionNumber());
+        if (PlaceholderFragment.getSectionNumber()<2){
+            MainActivity.mixedQuotesList.clear();
+        }else {
+            MainActivity.mixedQuotesList = (getMixedQuotesList().subList(0, PlaceholderFragment.getSectionNumber() - 2));
+        }
+        setLengthOfList(QuotesKeeper.dataLength(context, getLanguage()) + getMixedQuotesList().size());
+        setMixedQuotesList(QuotesKeeper.getQuotesList(context,  getLanguage(),0));
+        setReloader(false);
+        setVariableToWriteViews(0);
+        adapter.notifyDataSetChanged();
+    }
+
+
+
+//    public List<Quotes> randomQuote(List<Quotes> array) {
+//        Random ran = new Random();
+//        List<Quotes> newArray = new ArrayList<>();
+//        while(array.size()>0){
+//            int index = ran.nextInt(array.size());
+//            newArray.add(array.get(index));
+//            array.remove(index);
+//        }
+//        return newArray;
+//    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        if (savedInstanceState!=null){
+            setLanguage(savedInstanceState.getString(KEY_LANGUAGE));
+        }
+
+
+
+
+        setLengthOfList(QuotesKeeper.dataLength(getApplicationContext(), getLanguage()));
+        List<Quotes> list = QuotesKeeper.getQuotesList(getApplicationContext(), language, 0);
+
+
         setContentView(R.layout.activity_main);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        mixedQuotesList = list;//= randomQuote(list);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
+
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        QuotesKeeper qk = new QuotesKeeper();
-        List<Quotes> list = qk.getQuotesList(getApplicationContext());
-        mixedQuotesList = randomQuote(list);
 
+
+        //new DbHelper(getApplicationContext()).fillData(mQuotesList);
+       // Log.d("Test", String.valueOf(lengthOfList));
+        //new DbHelper(getApplicationContext()).delete();
+        //mixedQuotesList = randomQuote(mQuotesList);
+        //lengthOfList = mQuotesList.size();
+    }
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_ukr) {
+            // Handle the camera action
+            setLanguage("ukr");
+            refresher(mSectionsPagerAdapter, getApplicationContext());
+        } else if (id == R.id.nav_rus) {
+            setLanguage("rus");
+//            QuotesKeeper qk = new QuotesKeeper();
+//
+//            List<Quotes> list = qk.getQuotesList(getApplicationContext(), language);
+//            lengthOfList = list.size();
+//            mixedQuotesList = list;
+//            mSectionsPagerAdapter.notifyDataSetChanged();
+            refresher(mSectionsPagerAdapter, getApplicationContext());
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
 
     /**
@@ -114,11 +292,115 @@ public class MainActivity extends AppCompatActivity {
         private String savedAuthor;
         private String[] savedTags;
         private Quotes quote;
-        private DbHelper mDbHelper;
+        // private List<List<Quotes>> mList = new ArrayList<>();
+        private Context mContext;
+        private static Boolean checkingOfExecution = true;
+        private static int sectionNumber;
+
+        public static Boolean getCheckingOfExecution() {
+            return checkingOfExecution;
+        }
+
+        public static int getSectionNumber() {
+            return sectionNumber;
+        }
+
+        public static void setSectionNumber(int sectionNumber) {
+            PlaceholderFragment.sectionNumber = sectionNumber;
+        }
+
+        public static void setCheckingOfExecution(Boolean checkingOfExecution) {
+            PlaceholderFragment.checkingOfExecution = checkingOfExecution;
+        }
 
 
         public PlaceholderFragment() {
         }
+
+        private class FetchQuotesTask extends AsyncTask<Void, Void, List<Quotes>> {
+            @Override
+            protected List<Quotes> doInBackground(Void... params) {
+//A part to start the site loader and parser
+                /*
+                try{
+                    Log.d("Test", "Start");
+                    String path = "http://pro-status.com.ua/citaty/citaty.php";
+                    String html;
+                    html = Catcher.html(path);
+                    String[] pathArray = Catcher.pageStealer(html);
+                    //pathArray[75]=path;
+                    String[] newTags = new String[((int)pathArray.length/2)];
+                    String[] newPath = new String[((int)pathArray.length/2)];
+                    int j =0;
+                    for (int i=1; i<pathArray.length; i=i+2){
+                        newTags[j] = pathArray[i];
+                        j++;
+                    }
+                    j =0;
+                    for (int i=0; i<pathArray.length; i=i+2){
+                        newPath[j] = pathArray[i];
+                        j++;
+                    }
+
+                    //System.arraycopy(pathArray, 72, newPath, 0, 21);
+                    int counter=0;
+//                    for (String paths: newPath) {
+//                        Log.d("Test", paths+" "+counter);
+//                        counter++;}
+
+                        for (j=240; j<449; j++) {
+
+                            List<List<Quotes>> mList = new ArrayList<>();
+//                      if ((paths!=null)&&(!paths.equals("http://tsytaty.ukrayinskoyu.pro/http://tsytaty.ukrayinskoyu.pro/chas.html"))&&
+//                              (!paths.equals("http://tsytaty.ukrayinskoyu.pro/http://tsytaty.ukrayinskoyu.pro/chas-2.html"))&&(paths.equals())){
+                            path = newPath[j].replaceAll(" ","%20");
+//                        }
+                        for (int i = 0; i < 5; i++) {
+                            List<Quotes> q = new ArrayList<Quotes>();
+                            html = Catcher.html(path);
+                            q = Catcher.purser(html);
+                            for (Quotes quote: q){
+                                quote.setTags(new String[]{newTags[j]});
+                                Log.d("Test","TAGS "+ Arrays.toString(quote.getTags()));
+                            }
+                            if (q != null) {
+                                mList.add(q);
+                            }
+                            path = Catcher.catcherForNextPage(html);
+                            if (path.equals("")){
+                                Log.d("Test", "BREAK");
+                                break;
+
+                            }
+
+                        }
+                        DbHelper mDbHelper = new DbHelper(getContext());
+                        counter++;
+                        Log.d("Test", "All Done: "+counter);
+                        for (List<Quotes> q : mList) {
+
+                            mDbHelper.fillData(q);
+                        }
+                    }
+                }catch (IOException ioe){
+                    Log.d("Test", "Failed because: ", ioe);
+                }
+                return  null;
+            }
+*/
+
+                List<Quotes> q = new ArrayList<Quotes>();
+                q.addAll(QuotesKeeper.getQuotesList(getContext(), getLanguage(), getMixedQuotesList().size()));
+                return q;
+            }
+
+            @Override
+            protected void onPostExecute(List<Quotes> result) {
+                // TODO Auto-generated method stub
+                setMixedQuotesList(result);
+            }
+        }
+
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -129,30 +411,11 @@ public class MainActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            Log.d("Test", "Checking the position: " + String.valueOf(sectionNumber));
             return fragment;
         }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            super.onCreateView(inflater, container, savedInstanceState);
-
-
-
-            quote = getMixedQuotesList().get(getArguments().getInt(ARG_SECTION_NUMBER));;
-            if (savedInstanceState != null){
-                savedQuote = savedInstanceState.getString(KEY_QUOTE);
-                savedAuthor = savedInstanceState.getString(KEY_AUTHOR);
-                savedTags = savedInstanceState.getStringArray(KEY_TAGS);
-            }else{
-                savedQuote = quote.getQuote();
-                savedAuthor = quote.getAuthor();
-                savedTags = quote.getTags();
-            }
-
-
-
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        public void printer(View rootView) {
             TextView textViewQuote = (TextView) rootView.findViewById(R.id.quote);
             textViewQuote.setText(savedQuote);
 
@@ -162,43 +425,109 @@ public class MainActivity extends AppCompatActivity {
 
             View linearLayout = rootView.findViewById(R.id.tagLayout);
             for (String savedTag : savedTags) {
-              TextView text = new TextView(linearLayout.getContext());
-                text.setText(savedTag + "   ");
+                TextView text = new TextView(linearLayout.getContext());
+                text.setText(savedTag + " ");
+                Log.d("Test", "TAGS: " + savedTag);
                 text.setId(Arrays.asList(savedTags).indexOf(savedTag));
                 ((LinearLayout) linearLayout).addView(text);
                 text.setOnClickListener(this);
             }
+        }
 
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            super.onCreateView(inflater, container, savedInstanceState);
+
+
+            setSectionNumber(getArguments().getInt(ARG_SECTION_NUMBER));
+            quote = getMixedQuotesList().get(getArguments().getInt(ARG_SECTION_NUMBER));
+
+            if ((lengthOfList > (getMixedQuotesList().size())) && (getCheckingOfExecution())) {
+                Log.d("Test", lengthOfList + " NEXT " + getMixedQuotesList().size());
+
+                setCheckingOfExecution(false);
+                new FetchQuotesTask().execute();
+//                Log.d("Test", "List = " + l.size() + "   " + l.get(0).getQuote());
+
+            }
+
+            if ((savedInstanceState != null) && (getReloader())) {
+                savedQuote = savedInstanceState.getString(KEY_QUOTE);
+                savedAuthor = savedInstanceState.getString(KEY_AUTHOR);
+                savedTags = savedInstanceState.getStringArray(KEY_TAGS);
+            } else {
+                savedQuote = quote.getQuote();
+                savedAuthor = quote.getAuthor();
+                savedTags = quote.getTags();
+                if (!getReloader() && (getVariableToWriteViews() > 2)) {
+                    setReloader(true);
+                } else {
+                    setVariableToWriteViews(getVariableToWriteViews() + 1);
+                }
+            }
+
+
+            final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            printer(rootView);
+
+            final TextView textViewAuthor = (TextView) rootView.findViewById(R.id.author);
             textViewAuthor.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String author = textViewAuthor.getText().toString();
-Log.d("Test", "STARTED");
-                  /*  DbHelper dbw = new DbHelper(getContext());
-                    dbw.getWritableDatabase();
-                    Log.d("Test", "db.getWritableDatabase();");
-                    SQLiteDatabase db = dbw.getWritableDatabase();
-                    Cursor cursor = db.query(DbHelper.TABLE_NAME, new String[] { DbHelper.COLOM_NAME_ID,
-                                    DbHelper.COLOM_NAME_AUTHOR, DbHelper.COLOM_NAME_QUOTE, DbHelper.COLOM_NAME_TAGS }, DbHelper.COLOM_NAME_ID + "=?",
-                            new String[] { String.valueOf(1) }, null, null, null, null);
-
-                    if (cursor != null){
-                        cursor.moveToFirst();
-                    }
-
-                    String[] contact = new String[]{(cursor.getString(0)), cursor.getString(1), cursor.getString(2)};
-Log.d("Test", String.valueOf((contact)));*/
                     startMethodNewActivity(author, "author");
                 }
             });
 
 
+            Button databaseFiller = (Button) rootView.findViewById(R.id.databaseFiller);
+            databaseFiller.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    DbHelper mHelper = new DbHelper (getContext());
+//                    SQLiteDatabase mDatabase = mHelper.getWritableDatabase();
+//                    mDatabase.execSQL("delete from quotes");
+//                    mDatabase.execSQL("DROP TABLE IF EXISTS quotes");
+//
+//                    Log.d("Test", "DELETE table started");
+//                    Log.d("Test", "quote "+mHelper.getData().get(0).getQuote());
+//
+
+//
+//                    List<Quotes> list = new ArrayList<Quotes>();
+//                    list.addAll(mixedQuotesList.subList(22, 26));
+//                    list.addAll(mixedQuotesList.subList(31, 34));
+//                    list.addAll(mixedQuotesList.subList(57, 271));
+//                    Log.d("Test", "LIST: " + list.size() + " " + list.get(5).getQuote());
+//
+//
+                    //Log.d("test", "quote: "+ new DbHelper(getContext()).properlyDataGetterForTwoLanguages(0, language).get(2).getQuote());
+                    //new DbHelper(getContext()).killDoubles();
+                    // new DbHelper(getContext()).getLengthOfList("mix");
+//                    new DbHelper(getContext()).normalRemoverForDoules();
+                    //                   Log.d("Test", "FINAL LENGTH OF THE NEW BD" + (new DbHelper(getContext()).getQ("ukr") + new DbHelper(getContext()).getQ("rus")));
+//                    new DbHelper(getContext()).removeDB();
+//                    new DbHelper(getContext()).properlyFilling(new DbHelper(getContext()).getQ("ukr"), "ukr");
+//                    new DbHelper(getContext()).properlyFilling(new DbHelper(getContext()).getQ("rus"), "rus");
+                    //new DbHelper(getContext()).delete();
+                    // new FetchQuotesTask().execute();
+                    // new DbHelper(getContext()).killDoubles();
+//                    String path = Environment.getExternalStorageDirectory().toString()+"/FQuotesArray.txt";//"\\Phone\\Books"
+//                    Log.d("Test", Arrays.toString((getMixedQuotesList().get(1).getTags())));
+
+                    //new DbHelper(getContext()).properlyFilling(getMixedQuotesList(), "ukr");
+//                    fileWriter.WriteSettings(getContext(), getMixedQuotesList(), path);
+
+                }
+            });
 
             return rootView;
         }
 
         @Override
-        public void onSaveInstanceState(Bundle savedInstanceState){
+        public void onSaveInstanceState(Bundle savedInstanceState) {
             super.onSaveInstanceState(savedInstanceState);
             savedInstanceState.putString(KEY_QUOTE, savedQuote);
             savedInstanceState.putString(KEY_AUTHOR, savedAuthor);
@@ -214,22 +543,24 @@ Log.d("Test", String.valueOf((contact)));*/
         }
 
 
-    public void startMethodNewActivity(String word, String key){
-        Intent intent = new Intent(getActivity(), SecondActivity.class);
-        String[] transport = {word, key};
-        intent.putExtra(EXTRA_KEY_FOND, transport);
-     /* //Fill the empty database.
-        QuotesKeeper qk = new QuotesKeeper();
-        mDbHelper = new DbHelper(getActivity());
-        mDbHelper.fillData(qk.getQuotesList());*/
-        startActivity(intent);
+        public void startMethodNewActivity(String word, String key) {
+            Intent intent = new Intent(getActivity(), SecondActivity.class);
+            String[] transport = {word, key, getLanguage()};
+            intent.putExtra(EXTRA_KEY_FOND, transport);
+            startActivity(intent);
+        }
     }
-}
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(KEY_LANGUAGE, getLanguage());
+
+    }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {//FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -246,9 +577,13 @@ Log.d("Test", String.valueOf((contact)));*/
         @Override
         public int getCount() {
             // Show 3 total pages.
-            QuotesKeeper qk = new QuotesKeeper();
-            return qk.getQuotesList(getApplicationContext()).size();
+            Log.d("Test", String.valueOf(lengthOfList));
+            return lengthOfList;
 
+        }
+        public int getItemPosition(Object object){
+
+            return  SectionsPagerAdapter.POSITION_NONE;
         }
 
 
