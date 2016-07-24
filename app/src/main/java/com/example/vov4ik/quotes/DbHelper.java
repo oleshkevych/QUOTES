@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.ArraySet;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by vov4ik on 6/8/2016.
@@ -133,6 +135,17 @@ public class DbHelper extends SQLiteOpenHelper{
             COLUMN_ID_IN_CONNECTION_TABLE_TWO_LANGUAGES_NEW + " INTEGER PRIMARY KEY,"+ COLUMN_ID_OF_QUOTES_IN_CONNECTION_TABLE_TWO_LANGUAGES_NEW + " LONG," +
             COLUMN_ID_OF_TAGS_IN_CONNECTION_TABLE_TWO_LANGUAGES_NEW + " LONG" + ");";
 
+//Table for the game. Names and ranks of the players
+    final static String TABLE_FOR_NAMES_OF_PLAYERS = "tableWithNamesAndRanksOfThePlayersOfTheGame";
+    final static String COLUMN_ID_OF_THE_PLAYER = "columnForIdsOfThePlayers";
+    final static String COLUMN_PLAYERS_NAMES = "columnForKeepingPlayersNames";
+    final static String COLUMN_RANK_OF_THE_PLAYER = "columnForKeepingTheRankOfThePlayer";
+    final static String COLUMN_PASSWORD_OF_THE_PLAYER = "columnForKeepingThePasswordOfThePlayer";
+
+
+    final static String CREATE_TABLE_FOR_THE_GAME = "CREATE TABLE IF NOT EXISTS "+TABLE_FOR_NAMES_OF_PLAYERS+" (" +
+            COLUMN_ID_OF_THE_PLAYER+ " INTEGER PRIMARY KEY,"+ COLUMN_PLAYERS_NAMES +
+            " TEXT," + COLUMN_PASSWORD_OF_THE_PLAYER + " TEXT," +COLUMN_RANK_OF_THE_PLAYER +" TEXT" + ");";
 
     public DbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -150,7 +163,96 @@ public class DbHelper extends SQLiteOpenHelper{
 
 
     }
+//methods for the game
+    public void addNewPlayer(String nameOfThePlayer, String password){
+        open();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_PLAYERS_NAMES, nameOfThePlayer);
+        contentValues.put(COLUMN_PASSWORD_OF_THE_PLAYER, password);
+        contentValues.put(COLUMN_RANK_OF_THE_PLAYER, "0:0");
+        mDatabase.insert(
+                TABLE_FOR_NAMES_OF_PLAYERS, null, contentValues);
+        mDatabase.close();
+    }
+    public List<Game> getPlayers(){
+        open();
+        Cursor cursor = mDatabase.rawQuery("SELECT *  FROM " + TABLE_FOR_NAMES_OF_PLAYERS, null);
+        cursor.moveToFirst();
+        List<Game> gameList = new ArrayList<>();
+        if (cursor.isFirst()) {
+            do {
+                gameList.add(new Game(cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        mDatabase.close();
+        return gameList;
+    }
+    public String rankFinder(String name){
+        open();
+        Cursor cursor = mDatabase.rawQuery("SELECT *  FROM " + TABLE_FOR_NAMES_OF_PLAYERS + " WHERE " + COLUMN_PLAYERS_NAMES + "='" + name+"'" , null);
+        cursor.moveToFirst();
+        String rank = cursor.getString(3);
+        cursor.close();
+        mDatabase.close();
+        return rank;
+    }
 
+    public void rankUpdater(String name, String rank){
+        open();
+        Cursor cursor = mDatabase.rawQuery("SELECT *  FROM " + TABLE_FOR_NAMES_OF_PLAYERS + " WHERE " + COLUMN_PLAYERS_NAMES + "='" + name+"'" , null);
+        cursor.moveToFirst();
+        mDatabase.execSQL("DELETE FROM " + TABLE_FOR_NAMES_OF_PLAYERS + " WHERE " + COLUMN_ID_OF_THE_PLAYER + "=" + cursor.getLong(0));
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_PLAYERS_NAMES, name);
+        contentValues.put(COLUMN_PASSWORD_OF_THE_PLAYER, cursor.getString(2));
+        contentValues.put(COLUMN_RANK_OF_THE_PLAYER, rank);
+        mDatabase.insert(
+                TABLE_FOR_NAMES_OF_PLAYERS, null, contentValues);
+        cursor.close();
+        mDatabase.close();
+    }
+//method for SearchingActivity
+    public String[] getAuthorsForSearching(){
+
+        open();
+        Set<String> set = new ArraySet<>();
+        Cursor cursor = mDatabase.rawQuery("SELECT *  FROM "
+                + QUOTES_AND_AUTHORS_TABLE_NAME_TWO_LANGUAGES , null);
+        cursor.moveToFirst();
+        do{
+            set.add(cursor.getString(1));
+        }while ((cursor.moveToNext()));
+        cursor.close();
+        mDatabase.close();
+        String[] returnAuthor = new String[set.size()];
+        int i=0;
+        for(String s: set){
+            returnAuthor[i] = s;
+            i++;
+        }
+
+        return returnAuthor;
+    }
+    public String[] getTagsForSearching(){
+        open();
+        Set<String> set = new ArraySet<>();
+        Cursor cursor = mDatabase.rawQuery("SELECT *  FROM "
+                + TAGS_TABLE_NAME_TWO_LANGUAGES , null);
+        cursor.moveToFirst();
+        do{
+            set.add(cursor.getString(1));
+        }while ((cursor.moveToNext()));
+        cursor.close();
+        mDatabase.close();
+        String[] returnTags = new String[set.size()];
+        int i=0;
+        for(String s: set){
+            returnTags[i] = s;
+            i++;
+        }
+       return returnTags;
+    }
 //recording data to a single table;
     public void fillData(List<Quotes> mQuotesList) {
         open();
@@ -309,6 +411,7 @@ public class DbHelper extends SQLiteOpenHelper{
         mDatabase.execSQL(CREATE_TABLE_TAGS_TWO_LANGUAGES_NEW);
         mDatabase.execSQL(CREATE_TABLE_QUOTES_AND_AUTHORS_TWO_LANGUAGES_NEW);
         mDatabase.execSQL(CREATE_TABLE_CONNECTION_TWO_LANGUAGES_NEW);
+        mDatabase.execSQL(CREATE_TABLE_FOR_THE_GAME);
         return this;
     }
 
@@ -350,7 +453,6 @@ public class DbHelper extends SQLiteOpenHelper{
                 found.add(getTagsFromConnectionTableForTwoLanguages(cursorForQuotesTable));
             }while(cursorForQuotesTable.moveToNext());
             cursorForQuotesTable.close();
-            Log.d("Test", "find 1");
         }else{
             Cursor cursorForTagsTable;
             if (language.equals("mix")) {
@@ -442,7 +544,7 @@ public class DbHelper extends SQLiteOpenHelper{
         List<Quotes> quotesList = new ArrayList<>();
         open();
         Cursor cursorForQuotesTable = mDatabase.rawQuery(selectQuery, null);
-        for (int i=0; i<MainActivity.getLengthOfReadingInDatabase(); i++) {
+        for (int i=0; i<arrayOfReadingPositions.length; i++) {
             cursorForQuotesTable.moveToPosition(arrayOfReadingPositions[i]);
             quotesList.add(getTagsFromConnectionTableForTwoLanguages(cursorForQuotesTable));
         }

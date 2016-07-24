@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -19,20 +18,30 @@ public class QuotesKeeper{
     public QuotesKeeper (){
     }
 
-    public static List<Quotes> getQuotesList(Context context, String language, int startPosition) {
+    public static List<Quotes> getQuotesList(Context context, String language, int startPosition, int[] mixer, int lengthOfTheList) {
         List<Quotes> mQuotesList = new ArrayList<Quotes>();
         DbHelper mDbHelper = new DbHelper(context);
-        int lengthOfReadingInDatabase = MainActivity.getLengthOfReadingInDatabase();
-        int[] arrayOfReadingPositions = new int[lengthOfReadingInDatabase];
-        int[] mixer = MainActivity.getMixerForQuotesList();
-        if(mixer.length-startPosition<lengthOfReadingInDatabase){
-            System.arraycopy(mixer, startPosition, arrayOfReadingPositions, 0, mixer.length-startPosition);
-        }else {
-            System.arraycopy(mixer, startPosition, arrayOfReadingPositions, 0, lengthOfReadingInDatabase);
+        int lengthOfReadingInDatabase=0;
+        if (lengthOfTheList == 0) {
+            lengthOfReadingInDatabase = MainActivity.getLengthOfReadingInDatabase();
+        }else{
+            lengthOfReadingInDatabase=lengthOfTheList;
         }
-        Log.d("Test", "mixerForQuotesList QuotesKeeper: " + Arrays.toString(arrayOfReadingPositions));
-        mQuotesList = mDbHelper.properlyDataGetterForTwoLanguages(arrayOfReadingPositions, language);
-
+        int[] arrayOfReadingPositions = new int[lengthOfReadingInDatabase];
+        if (mixer!=null) {
+            if (mixer.length - startPosition < lengthOfReadingInDatabase) {
+                System.arraycopy(mixer, startPosition, arrayOfReadingPositions, 0, mixer.length - startPosition);
+            } else {
+                System.arraycopy(mixer, startPosition, arrayOfReadingPositions, 0, lengthOfReadingInDatabase);
+            }
+            mQuotesList = mDbHelper.properlyDataGetterForTwoLanguages(arrayOfReadingPositions, language);
+        }else{
+            for (int i = startPosition; i<(((startPosition + lengthOfReadingInDatabase)>dataLength(context, language))?dataLength(context, language):
+                    (startPosition + lengthOfReadingInDatabase) ); i++){
+                arrayOfReadingPositions[i] = i;
+            }
+            mQuotesList = mDbHelper.properlyDataGetterForTwoLanguages(arrayOfReadingPositions, language);
+        }
 
 /*
 
@@ -87,25 +96,8 @@ public class QuotesKeeper{
 
 
 
-    public List<Quotes> find( String searchWord, String searchSection, Context context, String language){
-        List<Quotes> finedList = new ArrayList<>();
+    public static List<Quotes> find(String searchWord, String searchSection, Context context, String language){
         DbHelper mDbHelper = new DbHelper(context);
-//        List<Quotes> list = getQuotesList(context);
-//        for (Quotes quotes :list) {
-//            if (Objects.equals(searchSection, "author")){
-//                if (Objects.equals(quotes.getAuthor(), searchWord)){
-//                    finedList.add(quotes);
-//                }
-//            }else{
-//                for (String tag : quotes.getTags()) {
-//                    if (Objects.equals(tag, searchWord)){
-//                        finedList.add(quotes);
-//                    }
-//                }
-//            }
-//
-//        }
-
         return mDbHelper.find(searchWord, searchSection, language);//finedList;
     }
 
@@ -115,4 +107,35 @@ public class QuotesKeeper{
         return length;
     }
 
+    public static List<Game> getNamesOfThePlayers(Context context){
+        Log.d("Test", "getNamesOfThePlayers");
+        return new DbHelper(context).getPlayers();
+    }
+    public static void addNewPlayer(Context context, String name, String password){
+        Log.d("Test", "addNewPlayer");
+
+         new DbHelper(context).addNewPlayer(name, password);
+    }
+    public static String rankFinder(Context context, String name){
+        Log.d("Test", "rankFinder");
+        return new DbHelper(context).rankFinder(name);
+    }
+    public static void rankUpdater(Context context, String name, String rank){
+        Log.d("Test", "rankUpdater");
+
+        new DbHelper(context).rankUpdater(name, rank);
+    }
+    public static int findLength(String searchWord, String searchSection, Context context, String language){
+        Log.d("Test", "findLength");
+        DbHelper mDbHelper = new DbHelper(context);
+        return mDbHelper.find(searchWord, searchSection, language).size();
+    }
+    public static String[] getForSearchingActivity(Context context, String string){
+        DbHelper mDbHelper = new DbHelper(context);
+        if(string.equals("author")) {
+            return mDbHelper.getAuthorsForSearching();
+        }else{
+            return mDbHelper.getTagsForSearching();
+        }
+    }
 }

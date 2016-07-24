@@ -12,17 +12,8 @@
             android:title="@string/lang_rus"/>
         <item
             android:id="@+id/nav_mix"
-            android:icon="@drawable/icon_for_mix"
             android:title="@string/lang_mix"/>
-        <item
-            android:id="@+id/the_game"
-            android:icon="@drawable/icon_game"
-            android:title="@string/game"/>
 
-        <item
-            android:id="@+id/search_activity_start"
-            android:icon="@drawable/icon_search"
-            android:title="@string/search"/>
     </group>
 
 </menu>

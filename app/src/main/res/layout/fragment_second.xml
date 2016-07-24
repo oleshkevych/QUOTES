@@ -17,17 +17,18 @@
         android:textStyle="bold"
         android:padding="7dp"
         android:textColor="@color/colorWhite"
-        android:background="@color/colorBlack"/>
+        android:background="@drawable/shape_for_black"/>
     <LinearLayout
         android:id="@+id/tagLayoutFound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="3dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="55dp"
         android:layout_alignParentRight="true"
         android:textStyle="italic"
-        android:background="@color/color_background"
-        android:orientation="horizontal"/>
+        android:orientation="horizontal"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"
+        android:layout_alignParentEnd="false"/>
 
     <TextView
         android:id="@+id/quoteFound"
@@ -36,10 +37,12 @@
         android:padding="3dp"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:background="@color/color_background"
+        android:background="@drawable/shape"
         android:layout_marginBottom="29dp"
         android:layout_above="@+id/authorFound"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"/>
 
     <TextView
         android:id="@+id/authorFound"
@@ -47,7 +50,7 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:textStyle="bold"
-        android:background="@color/color_background"
+        android:background="@drawable/shape"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"/>
 

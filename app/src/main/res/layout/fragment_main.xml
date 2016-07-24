@@ -17,8 +17,9 @@
         android:padding="3dp"
         android:layout_alignParentRight="true"
         android:textStyle="italic"
-        android:background="@color/color_background"
-        android:orientation="horizontal"/>
+        android:orientation="horizontal"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"/>
 
     <TextView
         android:id="@+id/quote"
@@ -26,10 +27,14 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:gravity="center"
-        android:background="@color/color_background"
+        android:background="@drawable/shape"
         android:layout_marginBottom="29dp"
         android:layout_above="@+id/author"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"
+        android:paddingLeft="18dp"
+        android:paddingRight="18dp"/>
 
     <TextView
         android:id="@+id/author"
@@ -37,9 +42,11 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:textStyle="bold"
-        android:background="@color/color_background"
+        android:background="@drawable/shape"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"/>
     <!--<Button
         android:id="@+id/fillQuotesButton"
         android:layout_width="fill_parent"
@@ -57,12 +64,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="DELETE"
-        android:layout_alignLeft="@id/tagLayout"/>-->
+        android:layout_alignLeft="@id/tagLayout"/>
     <Button
         android:id="@+id/databaseFiller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="Start filling new database"/>
+        android:text="Start filling new database"/>-->
 
 </RelativeLayout>

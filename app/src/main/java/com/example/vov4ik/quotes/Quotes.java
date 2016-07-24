@@ -1,6 +1,6 @@
 package com.example.vov4ik.quotes;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -50,7 +50,45 @@ public class Quotes {
         this.mQuote = quote;
     }
 
+//    @Override
+//    public String toString() {
+//        String tags = "";
+//        for (int i=0; i<getTags().length; i++){
+//            if (getTags()[i].length()>3) {
+//                if (i < getTags().length - 1) {
+//                    tags = tags + "\"" + getTags()[i] + "\",";
+//                } else {
+//                    tags = tags + "\"" + getTags()[i] + "\"";
+//                }
+//            }
+//        }
+//        if (tags.length()<3){
+//            tags = "\" \"";
+//        }
+//        return "\"contents\": {\n" +
+//                "        \"quotes\": [\n" +
+//                "            {\n" +
+//                "                \"author\": \"" + mAuthor + "\","+
+//                "                \"quote\": \""+ mQuote +"\",\n" +
+//                "                \"tags\": [\n" +tags+
+//                "                ]\n" +
+//                "            }\n" +
+//                "        ]\n" +
+//                "    }\n" +
+//                "}";
+//    }
+
+    @Override
+    public String toString() {
+        return "Quotes{" +
+                "Author='" + mAuthor + '\'' +
+                ", Quote='" + mQuote + '\'' +
+                ", Tags=" + Arrays.toString(mTags) +
+                '}';
+    }
+
     public void setTags(String[] tags) {
         this.mTags = tags;
+
     }
 }

@@ -17,8 +17,9 @@
         android:padding="3dp"
         android:layout_alignParentRight="true"
         android:textStyle="italic"
-        android:background="@color/color_background"
-        android:orientation="horizontal"/>
+        android:orientation="horizontal"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"/>
 
     <TextView
         android:id="@+id/quote"
@@ -26,10 +27,12 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:gravity="center"
-        android:background="@color/color_background"
+        android:background="@drawable/shape"
         android:layout_marginBottom="29dp"
         android:layout_above="@+id/author"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp"
+        android:textColor="@color/colorBlack"/>
 
     <TextView
         android:id="@+id/author"
@@ -37,7 +40,7 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:textStyle="bold"
-        android:background="@color/color_background"
+        android:background="@drawable/shape"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"/>
 

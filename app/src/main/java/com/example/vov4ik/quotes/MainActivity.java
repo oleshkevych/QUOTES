@@ -3,26 +3,23 @@ package com.example.vov4ik.quotes;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -30,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -54,12 +52,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_AUTHOR = "used_author";
     private static final String KEY_TAGS = "used_tags";
     private static final String EXTRA_KEY_FOND = "com.example.vov4ik.quotesSearching_keys";
+    private static final String EXTRA_NUMBER = "NUMBER_FOR_THE_FIRST_QUOTE";
     private static List<Quotes> mixedQuotesList, sList;
     private static Boolean reloader = true;
     private static int lengthOfList;
     private static int variableToWriteViews = 0;
     private static int[] mixerForQuotesList;
     private static final int lengthOfReadingInDatabase = 5;
+    private static int lengthBeforeReload = 0;
+    private static int numberForFirst;
+
+    public static int getNumberForFirst() {
+        return numberForFirst;
+    }
+
+    public static void setNumberForFirst(int numberForFirst) {
+        MainActivity.numberForFirst = numberForFirst;
+    }
 
     public static int getLengthOfReadingInDatabase() {
         return lengthOfReadingInDatabase;
@@ -71,6 +80,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static void setVariableToWriteViews(int variableToWriteViews) {
         MainActivity.variableToWriteViews = variableToWriteViews;
+    }
+
+    public static int getLengthBeforeReload() {
+        return lengthBeforeReload;
+    }
+
+    public static void setLengthBeforeReload(int lengthBeforeReload) {
+        MainActivity.lengthBeforeReload = lengthBeforeReload;
     }
 
     public static void setLanguage(String language) {
@@ -109,8 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static void setLengthOfList(int lengthOfList) {
-        Random ran = new Random();
-
         int lengthOfArray;
         if(PlaceholderFragment.getSectionNumber()<2) {
             lengthOfArray = lengthOfList;
@@ -118,9 +133,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             lengthOfArray = lengthOfList - getMixedQuotesList().size();
         }
 
-        int[]newArray = new int[lengthOfArray + 1];
+        int[]result = new int[lengthOfArray];
+        for (int i = 0; i < lengthOfArray; i++) {
+            result[i] = i;
+        }
+        Random rnd = ThreadLocalRandom.current();
+        int indexOfNumberForFirst =  rnd.nextInt(lengthOfArray);
+        for (int i = lengthOfArray - 1; i > 1; i--)
+        {
 
-            for (int i = 1; i <= lengthOfArray; i++) {
+            int index = rnd.nextInt(i + 1);
+            int a = result[index];
+            result[index] = result[i];
+            result[i] = a;
+            if(result[i] == getNumberForFirst()) {
+                indexOfNumberForFirst = i;
+            }
+        }
+        int a = result[0];
+
+        result[0] = result[indexOfNumberForFirst];
+        result[indexOfNumberForFirst] = a;
+        Log.d("Test", Arrays.toString(result));
+
+       /*     for (int i = 1; i <= lengthOfArray; i++) {
                 newArray[i] = i;
             }
         int[] result = new int[lengthOfArray];
@@ -128,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int index = ran.nextInt(lengthOfArray);
             if ((newArray[index]!=0)){
                 result[i] = newArray[index];
+                newArray[index]=0;
             }else do {
                 if ((index == lengthOfArray) && (newArray[index] == 0)) {
                     i--;
@@ -136,11 +173,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     index++;
                     if ((newArray[index] != 0)) {
                         result[i] = newArray[index];
+                        newArray[index]=0;
                         break;
                     }
                 }
             }while(true);
-        }
+        }*/
+
         setMixerForQuotesList(result);
         MainActivity.lengthOfList = lengthOfList;
     }
@@ -154,25 +193,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MainActivity.mixedQuotesList = (getMixedQuotesList().subList(0, PlaceholderFragment.getSectionNumber() - 2));
         }
         setLengthOfList(QuotesKeeper.dataLength(context, getLanguage()) + getMixedQuotesList().size());
-        setMixedQuotesList(QuotesKeeper.getQuotesList(context,  getLanguage(),0));
+        setLengthBeforeReload(getMixedQuotesList().size());
+        setMixedQuotesList(QuotesKeeper.getQuotesList(context, getLanguage(), 0, getMixerForQuotesList(), 0));
         setReloader(false);
+
         setVariableToWriteViews(0);
         adapter.notifyDataSetChanged();
     }
-
-
-
-//    public List<Quotes> randomQuote(List<Quotes> array) {
-//        Random ran = new Random();
-//        List<Quotes> newArray = new ArrayList<>();
-//        while(array.size()>0){
-//            int index = ran.nextInt(array.size());
-//            newArray.add(array.get(index));
-//            array.remove(index);
-//        }
-//        return newArray;
-//    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,10 +210,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+        if(getIntent()!=null){
+            int lengthOfTheList = QuotesKeeper.dataLength(getApplicationContext(), getLanguage());
+            Random rand = new Random();
+            int randomNumber = rand.nextInt(lengthOfTheList);
+            setNumberForFirst(getIntent().getIntExtra(EXTRA_NUMBER, randomNumber));
 
-
+        }
         setLengthOfList(QuotesKeeper.dataLength(getApplicationContext(), getLanguage()));
-        List<Quotes> list = QuotesKeeper.getQuotesList(getApplicationContext(), language, 0);
+        List<Quotes> list = QuotesKeeper.getQuotesList(getApplicationContext(), language, 0, getMixerForQuotesList(), 0);
 
 
         setContentView(R.layout.activity_main);
@@ -199,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setItemIconTintList(null);
 
         mixedQuotesList = list;//= randomQuote(list);
 
@@ -262,13 +295,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             refresher(mSectionsPagerAdapter, getApplicationContext());
         } else if (id == R.id.nav_rus) {
             setLanguage("rus");
-//            QuotesKeeper qk = new QuotesKeeper();
-//
-//            List<Quotes> list = qk.getQuotesList(getApplicationContext(), language);
-//            lengthOfList = list.size();
-//            mixedQuotesList = list;
-//            mSectionsPagerAdapter.notifyDataSetChanged();
             refresher(mSectionsPagerAdapter, getApplicationContext());
+        }else if (id == R.id.the_game) {
+            Intent intent = new Intent(getApplication(), LoginActivity.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_mix) {
+            setLanguage("mix");
+            refresher(mSectionsPagerAdapter, getApplicationContext());
+        }else if (id == R.id.search_activity_start) {
+            Intent intent = new Intent(getApplication(), SearchActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -390,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 */
 
                 List<Quotes> q = new ArrayList<Quotes>();
-                q.addAll(QuotesKeeper.getQuotesList(getContext(), getLanguage(), getMixedQuotesList().size()));
+                q.addAll(QuotesKeeper.getQuotesList(getContext(), getLanguage(), getMixedQuotesList().size()-getLengthBeforeReload(), getMixerForQuotesList(), 0));
                 return q;
             }
 
@@ -415,7 +451,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return fragment;
         }
 
-        public void printer(View rootView) {
+        public void displayLoadedQuote(View rootView) {
             TextView textViewQuote = (TextView) rootView.findViewById(R.id.quote);
             textViewQuote.setText(savedQuote);
 
@@ -425,12 +461,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             View linearLayout = rootView.findViewById(R.id.tagLayout);
             for (String savedTag : savedTags) {
-                TextView text = new TextView(linearLayout.getContext());
-                text.setText(savedTag + " ");
-                Log.d("Test", "TAGS: " + savedTag);
-                text.setId(Arrays.asList(savedTags).indexOf(savedTag));
-                ((LinearLayout) linearLayout).addView(text);
-                text.setOnClickListener(this);
+                if (savedTag.length()>3){
+                    TextView text = new TextView(linearLayout.getContext());
+                    text.setText(savedTag);
+                    text.setId(Arrays.asList(savedTags).indexOf(savedTag));
+                    ((LinearLayout) linearLayout).addView(text);
+                    text.setOnClickListener(this);
+                    text.setPadding(10, 4, 10, 4);
+                    ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) text.getLayoutParams();
+                    mlp.setMargins(10, 0, 10, 0);
+                    text.setBackground(getResources().getDrawable(R.drawable.shape));
+                }
             }
         }
 
@@ -470,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-            printer(rootView);
+            displayLoadedQuote(rootView);
 
             final TextView textViewAuthor = (TextView) rootView.findViewById(R.id.author);
             textViewAuthor.setOnClickListener(new View.OnClickListener() {
@@ -482,10 +523,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
 
 
-            Button databaseFiller = (Button) rootView.findViewById(R.id.databaseFiller);
-            databaseFiller.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+//            Button databaseFiller = (Button) rootView.findViewById(R.id.databaseFiller);
+//            databaseFiller.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
 //                    DbHelper mHelper = new DbHelper (getContext());
 //                    SQLiteDatabase mDatabase = mHelper.getWritableDatabase();
 //                    mDatabase.execSQL("delete from quotes");
@@ -518,13 +559,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                    Log.d("Test", Arrays.toString((getMixedQuotesList().get(1).getTags())));
 
                     //new DbHelper(getContext()).properlyFilling(getMixedQuotesList(), "ukr");
-//                    fileWriter.WriteSettings(getContext(), getMixedQuotesList(), path);
+//                    FileWriter.WriteSettings(getContext(), getMixedQuotesList(), path);
 
-                }
-            });
+
+//                }
+//            });
+
 
             return rootView;
         }
+
 
         @Override
         public void onSaveInstanceState(Bundle savedInstanceState) {

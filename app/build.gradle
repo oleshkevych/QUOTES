@@ -27,5 +27,9 @@ dependencies {
     compile 'com.android.support:support-v4:23.2.1'
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'org.apache.karaf.http:http:3.0.6'
-    compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
+    compile 'cz.msebera.android:httpclient:4.4.1.1'
+    compile 'com.navercorp.volleyextensions:volley-views:2.0.1'
+    compile 'com.navercorp.volleyextensions:volley-requests:2.0.1'
+    compile 'com.navercorp.volleyextensions:volley-caches:2.0.1'
+    compile 'com.google.code.gson:gson:2.7'
 }
