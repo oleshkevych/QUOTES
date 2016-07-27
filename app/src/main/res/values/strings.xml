@@ -10,6 +10,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_search">Search</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Name</string>
@@ -31,5 +32,11 @@
     <string name="search">Find the author or tag</string>
     <string name="author_in_search_activity">Author</string>
     <string name="tag_in_searching_activity">Tag</string>
-    <string name="hint1_for_search">Check the category</string>
+    <string name="hint_for_search">Select the category</string>
+    <string name="hint_tag_for_search">Enter the tag</string>
+    <string name="hint_author_search">Enter the author</string>
+    <string name="showAllText">Show All</string>
+    <string name="hideAllText">Hide</string>
+    <string name="findButtonInSearching">Find</string>
+
 </resources>

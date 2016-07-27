@@ -11,5 +11,6 @@
     <color name="textForRegistration">#fe0015ff</color>
     <color name="backgroundForRegistration">#88c7971f</color>
     <color name="backgroundForDrawable">#9abc04</color>
+    <color name="colorForTextViewSearching">#8e143d7e</color>
 
 </resources>

@@ -448,10 +448,11 @@ public class DbHelper extends SQLiteOpenHelper{
                         + QUOTES_AND_AUTHORS_TABLE_NAME_TWO_LANGUAGES + " WHERE " + COLUMN_AUTHORS_NAME_TWO_LANGUAGES
                         + "='" + searchWord + "' AND " + COLUMN_LANGUAGES_IN_AUTHOR_AND_QUOTES_TABLE_TWO_LANGUAGES + "='" + language + "'", null);
             }
-            cursorForQuotesTable.moveToFirst();
-            do{
-                found.add(getTagsFromConnectionTableForTwoLanguages(cursorForQuotesTable));
-            }while(cursorForQuotesTable.moveToNext());
+            if (cursorForQuotesTable.moveToFirst()) {
+                do {
+                    found.add(getTagsFromConnectionTableForTwoLanguages(cursorForQuotesTable));
+                } while (cursorForQuotesTable.moveToNext());
+            }
             cursorForQuotesTable.close();
         }else{
             Cursor cursorForTagsTable;
@@ -463,20 +464,21 @@ public class DbHelper extends SQLiteOpenHelper{
                         + TAGS_TABLE_NAME_TWO_LANGUAGES + " WHERE " + COLUMN_TAGS_NAME_TWO_LANGUAGES + "='" + searchWord + "' AND "
                         + COLUMN_LANGUAGES_IN_TAG_TABLE_TWO_LANGUAGES + "='" + language + "'", null);
             }
-            cursorForTagsTable.moveToFirst();
-            long idOfSearchingTag = cursorForTagsTable.getInt(cursorForTagsTable.getColumnIndex(COLUMN_ID_TAGS_NAME_TWO_LANGUAGES));
-            Cursor cursorForConnectionTable = mDatabase.rawQuery("SELECT *  FROM "
-                    + CONNECTION_TABLE_TWO_LANGUAGES + " WHERE " + COLUMN_ID_OF_TAGS_IN_CONNECTION_TABLE_TWO_LANGUAGES + "=" + idOfSearchingTag , null);
-            cursorForConnectionTable.moveToFirst();
-            do{
-                long idOfQuotes =  cursorForConnectionTable.getLong(cursorForConnectionTable.getColumnIndex(COLUMN_ID_OF_QUOTES_IN_CONNECTION_TABLE_TWO_LANGUAGES));
-                Cursor cursorQuotes = mDatabase.rawQuery("SELECT *  FROM "
-                        + QUOTES_AND_AUTHORS_TABLE_NAME_TWO_LANGUAGES + " WHERE " + COLUMN_ID_QUOTES_NAME_TWO_LANGUAGES + "=" + idOfQuotes , null);
-                cursorQuotes.moveToFirst();
-                found.add(getTagsFromConnectionTableForTwoLanguages(cursorQuotes));
-                cursorQuotes.close();
-            }while(cursorForConnectionTable.moveToNext());
-            cursorForConnectionTable.close();
+            if (cursorForTagsTable.moveToFirst()) {
+                long idOfSearchingTag = cursorForTagsTable.getInt(cursorForTagsTable.getColumnIndex(COLUMN_ID_TAGS_NAME_TWO_LANGUAGES));
+                Cursor cursorForConnectionTable = mDatabase.rawQuery("SELECT *  FROM "
+                        + CONNECTION_TABLE_TWO_LANGUAGES + " WHERE " + COLUMN_ID_OF_TAGS_IN_CONNECTION_TABLE_TWO_LANGUAGES + "=" + idOfSearchingTag, null);
+                cursorForConnectionTable.moveToFirst();
+                do {
+                    long idOfQuotes = cursorForConnectionTable.getLong(cursorForConnectionTable.getColumnIndex(COLUMN_ID_OF_QUOTES_IN_CONNECTION_TABLE_TWO_LANGUAGES));
+                    Cursor cursorQuotes = mDatabase.rawQuery("SELECT *  FROM "
+                            + QUOTES_AND_AUTHORS_TABLE_NAME_TWO_LANGUAGES + " WHERE " + COLUMN_ID_QUOTES_NAME_TWO_LANGUAGES + "=" + idOfQuotes, null);
+                    cursorQuotes.moveToFirst();
+                    found.add(getTagsFromConnectionTableForTwoLanguages(cursorQuotes));
+                    cursorQuotes.close();
+                } while (cursorForConnectionTable.moveToNext());
+                cursorForConnectionTable.close();
+            }
             cursorForTagsTable.close();
             Log.d("Test", "find 2");
         }

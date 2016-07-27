@@ -36,7 +36,7 @@
         android:id="@+id/quoteGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="3dp"
+        android:padding="@dimen/paddingMain"
         android:gravity="center"
         android:background="@drawable/shape"
         android:layout_marginBottom="29dp"
@@ -61,7 +61,6 @@
         android:background="@drawable/shape_for_black"
         android:text="NEXT"
         android:textColor="@color/colorWhite"
-        android:onClick="onClick"
         android:layout_below="@+id/quoteGame"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>

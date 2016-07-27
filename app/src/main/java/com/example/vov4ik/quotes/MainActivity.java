@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +24,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -219,6 +224,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         setLengthOfList(QuotesKeeper.dataLength(getApplicationContext(), getLanguage()));
         List<Quotes> list = QuotesKeeper.getQuotesList(getApplicationContext(), language, 0, getMixerForQuotesList(), 0);
+
+        Log.d("DB", getApplicationContext().getDatabasePath("Quotes.db").toString());
+
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+
+            if (sd.canWrite()) {
+                String currentDBPath = getApplicationContext().getDatabasePath("Quotes.db").toString();
+                String backupDBPath = "Quotes.db";
+                Log.d("DB", "COPYING: "+ sd);
+
+                File currentDB = new File(currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    Log.d("DB", "COPYING: "+ dst.toString());
+                    src.close();
+                    dst.close();
+
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d("DB", e.toString());
+        }
+
+
 
 
         setContentView(R.layout.activity_main);

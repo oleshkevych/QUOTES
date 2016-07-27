@@ -7,4 +7,5 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">250dp</dimen>
     <dimen name="big_text">20sp</dimen>
+    <dimen name="paddingMain">10dp</dimen>
 </resources>

@@ -8,6 +8,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  *
@@ -25,7 +26,7 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent alarmIntent = getStartPendingIntent(context);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                getTriggerAt(),
+                getTriggerAt(new Date()),
                 NOTIFICATIONS_INTERVAL_IN_DAYS * AlarmManager.INTERVAL_DAY,
                 alarmIntent);
     }
@@ -36,12 +37,11 @@ public class NotificationEventReceiver extends WakefulBroadcastReceiver {
         alarmManager.cancel(alarmIntent);
     }
 
-    private static long getTriggerAt() {
+    private static long getTriggerAt(Date now) {
         Calendar calendar = Calendar.getInstance();
 //        calendar.setTime(now);
-        calendar.setTimeInMillis(System.currentTimeMillis());
+//        calendar.setTime(now);
         calendar.set(Calendar.HOUR_OF_DAY, 9);
-//        calendar.set(Calendar.MINUTE, 38);
         //calendar.add(Calendar.HOUR, NOTIFICATIONS_INTERVAL_IN_HOURS);
         return calendar.getTimeInMillis();
     }

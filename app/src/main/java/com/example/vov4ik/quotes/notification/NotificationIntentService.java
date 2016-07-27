@@ -70,7 +70,7 @@ public class NotificationIntentService extends IntentService {
         list = QuotesKeeper.getQuotesList(getApplicationContext(), "mix", 0, randomNumber, 1);
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("Quote of the day")
+        builder.setContentTitle("Your quote of the day")
                 .setAutoCancel(true)
                 .setColor(getResources().getColor(R.color.colorPrimary))
                 .setContentText(list.get(0).getQuote())

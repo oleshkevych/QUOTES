@@ -277,7 +277,6 @@ public class SecondActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             String tag = savedTags[v.getId()];
-
             startMethodNewActivity(tag, "tags");
         }
 
@@ -365,6 +364,8 @@ public class SecondActivity extends AppCompatActivity {
         }
         mSectionsPagerAdapter.setLength(QuotesKeeper.findLength(getSearchingWord(), getSearchingKey(), getApplicationContext(), getLanguage()));
         mSectionsPagerAdapter.notifyDataSetChanged();
+
+
         super.onDestroy();
     }
 
