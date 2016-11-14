@@ -1,6 +1,7 @@
 package com.example.vov4ik.quotes;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -8,7 +9,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,8 +45,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int selectedNumber;
     private List<Quotes> list = new ArrayList<>();
     private Boolean checkingOfExecution = true;
-    private static final int GREEN = -16711936;
-    private static final int RED = -65536;
+//    -16711936; r=-65536;
+    private Drawable GREEN;
+    private Drawable RED;
     private String name;
     private String serializedString;
     private static final String KEY_LANGUAGE ="languageKey";
@@ -179,7 +180,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         String[] authors = new String[3];
         TextView quoteText = (TextView) findViewById(R.id.quoteGame);
         if (getRotationMarker()){
-            Log.d("Test","++++++++");
             authors = getAuthorsArray();
             setRotationMarker(false);
         }else {
@@ -216,16 +216,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
             quoteText.setText(getList().get(getGameCounter()).getQuote());
 
-
-//        TextView author1 = (TextView) findViewById(R.id.authorGame1);
-//        author1.setText(authors[0]);
-//        TextView author2 = (TextView) findViewById(R.id.authorGame2);
-//        author2.setText(authors[1]);
-//        TextView author3 = (TextView) findViewById(R.id.authorGame3);
-//        author3.setText(authors[2]);
-//        author1.setId(Arrays.asList(savedTags).indexOf(savedTag));
-//        ((LinearLayout) linearLayout).addView(text);
-//        text.setOnClickListener(this);
             LinearLayout linearLayout = (LinearLayout) findViewById(R.id.authorsLayout);
             linearLayout.removeAllViewsInLayout();
             for (String author : authors) {
@@ -234,21 +224,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 text.setId(Arrays.asList(authors).indexOf(author));
                 ((LinearLayout) linearLayout).addView(text);
                 text.setOnClickListener(this);
+                text.setPadding(20, 10, 20, 10);
+                text.setTextSize(16);
                 if(linearLayout.getOrientation() == linearLayout.HORIZONTAL){
-                    text.setPaddingRelative(4, 4, 4, 4);
                     ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) text.getLayoutParams();
-                    mlp.setMargins(10, 0, 10, 0);
-
+                    mlp.setMargins(12, 0, 12, 0);
                 }
 
                 if(linearLayout.getOrientation() == linearLayout.VERTICAL){
                     ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) text.getLayoutParams();
-                    mlp.setMargins(0, 8, 0, 8);
-                    text.setPadding(2, 2, 2, 2);
-
-
+                    mlp.setMargins(0, 12, 0, 12);
                 }
-                text.setBackgroundColor(getResources().getColor(R.color.color_background));
+                text.setBackground(getResources().getDrawable(R.drawable.shape));
             }
             TextView rank = (TextView) findViewById(R.id.playersRank);
             rank.setText(getRank());
@@ -274,7 +261,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setItemIconTintList(null);
-
+        RED = getResources().getDrawable(R.drawable.shape_wrong);
+        GREEN = getResources().getDrawable(R.drawable.shape_write);
         if(savedInstanceState!=null){
             setLanguage(savedInstanceState.getString(KEY_LANGUAGE));
             setName(savedInstanceState.getString(KEY_NAME));
@@ -350,13 +338,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 Boolean wins = false;
         if (selectedAuthor.equals(getList().get(getGameCounter()).getAuthor())) {
             wins = true;
-            linearLayout.findViewById(number).setBackgroundColor((GREEN));
+            linearLayout.findViewById(number).setBackground((GREEN));
 
         }else {
-            linearLayout.findViewById(number).setBackgroundColor((RED));
+            linearLayout.findViewById(number).setBackground((RED));
             for (int j = 0; j<3; j++){
                 if(getAuthorsArray()[j].equals(getList().get(getGameCounter()).getAuthor())){
-                    linearLayout.findViewById(j).setBackgroundColor((GREEN));
+                    linearLayout.findViewById(j).setBackground((GREEN));
                     break;
                 }
             }
@@ -503,6 +491,5 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         savedInstanceState.putInt(KEY_NUMBER, selectedNumber);
         savedInstanceState.putInt(KEY_COUNTER, getGameCounter());
         savedInstanceState.putIntArray(KEY_MIXER, getMixer());
-        Log.d("Test", "211212"+ serializedString);
     }
 }

@@ -14,7 +14,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/pergament"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -43,19 +43,19 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-        <!--<service-->
-            <!--android:name=".notification.NotificationIntentService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="false"/>-->
+        <service
+            android:name=".notification.NotificationIntentService"
+            android:enabled="true"
+            android:exported="false"/>
 
-        <!--<receiver android:name=".notification.NotificationEventReceiver"/>-->
-        <!--<receiver android:name=".notification.NotificationServiceStarterReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>-->
-                <!--<action android:name="android.intent.action.TIMEZONE_CHANGED"/>-->
-                <!--<action android:name="android.intent.action.TIME_SET"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver android:name=".notification.NotificationEventReceiver"/>
+        <receiver android:name=".notification.NotificationServiceStarterReceiver">
+            <!-- <intent-filter>
+                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+            </intent-filter>-->
+        </receiver>
 
         <activity
             android:name=".SearchActivity"

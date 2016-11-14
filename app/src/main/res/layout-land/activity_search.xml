@@ -96,7 +96,7 @@
             android:layout_height="wrap_content"
             android:text="@string/showAllText"
             android:textSize="@dimen/big_text"
-            android:textColor="@color/textForRegistration"
+            android:textColor="@color/colorForTextOnShowButton"
             android:padding="5dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/shape_for_textview_in_searching"

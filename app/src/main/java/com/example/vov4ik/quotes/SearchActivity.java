@@ -192,8 +192,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 text.setId(Arrays.asList(array).indexOf(s));
                 ((LinearLayout) linearLayout).addView(text);
                 text.setOnClickListener(this);
-                text.setPadding(10, 10, 10, 10);
-                //text.setTextSize(R.dimen.big_text);
+                text.setPadding(20, 10, 20, 10);
+                text.setTextSize(16);
                 ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) text.getLayoutParams();
                 mlp.setMargins(0, 15, 0, 15);
                 text.setBackground(getResources().getDrawable(R.drawable.shape));

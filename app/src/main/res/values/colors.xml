@@ -2,15 +2,18 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#ff0900</color>
-    <color name="color_background">#c7971f</color>
+    <color name="colorAccent">#0a1354</color>
+    <color name="color_background">#ecc7971f</color>
     <color name="colorBlack">#B3000000</color>
     <color name="colorWhite">#ffffff</color>
     <color name="winColor">#00d94c</color>
     <color name="black_overlay">#66000000</color>
-    <color name="textForRegistration">#fe0015ff</color>
+    <color name="textForRegistration">#fe000eae</color>
     <color name="backgroundForRegistration">#88c7971f</color>
     <color name="backgroundForDrawable">#9abc04</color>
     <color name="colorForTextViewSearching">#8e143d7e</color>
-
+    <color name="colorForShapeWrite">#d1028038</color>
+    <color name="colorForShapeWrong">#d4860004</color>
+    <color name="colorForTextOnShowButton">#afafaf</color>
+    <color name="background_material_dark_1">#352e2e</color>
 </resources>

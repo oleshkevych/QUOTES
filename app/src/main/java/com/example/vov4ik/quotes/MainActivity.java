@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,10 +23,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -159,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         result[0] = result[indexOfNumberForFirst];
         result[indexOfNumberForFirst] = a;
-        Log.d("Test", Arrays.toString(result));
+
 
        /*     for (int i = 1; i <= lengthOfArray; i++) {
                 newArray[i] = i;
@@ -224,38 +219,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         setLengthOfList(QuotesKeeper.dataLength(getApplicationContext(), getLanguage()));
         List<Quotes> list = QuotesKeeper.getQuotesList(getApplicationContext(), language, 0, getMixerForQuotesList(), 0);
-
-        Log.d("DB", getApplicationContext().getDatabasePath("Quotes.db").toString());
-
-        try {
-            File sd = Environment.getExternalStorageDirectory();
-            File data = Environment.getDataDirectory();
-
-            if (sd.canWrite()) {
-                String currentDBPath = getApplicationContext().getDatabasePath("Quotes.db").toString();
-                String backupDBPath = "Quotes.db";
-                Log.d("DB", "COPYING: "+ sd);
-
-                File currentDB = new File(currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
-
-                if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    Log.d("DB", "COPYING: "+ dst.toString());
-                    src.close();
-                    dst.close();
-
-                }
-            }
-
-        } catch (Exception e) {
-            Log.d("DB", e.toString());
-        }
-
-
-
 
         setContentView(R.layout.activity_main);
 
@@ -335,12 +298,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }else if (id == R.id.the_game) {
             Intent intent = new Intent(getApplication(), LoginActivity.class);
             startActivity(intent);
+            finish();
         }else if (id == R.id.nav_mix) {
             setLanguage("mix");
             refresher(mSectionsPagerAdapter, getApplicationContext());
         }else if (id == R.id.search_activity_start) {
             Intent intent = new Intent(getApplication(), SearchActivity.class);
             startActivity(intent);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -364,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         private String savedAuthor;
         private String[] savedTags;
         private Quotes quote;
-        // private List<List<Quotes>> mList = new ArrayList<>();
         private Context mContext;
         private static Boolean checkingOfExecution = true;
         private static int sectionNumber;
@@ -503,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     text.setId(Arrays.asList(savedTags).indexOf(savedTag));
                     ((LinearLayout) linearLayout).addView(text);
                     text.setOnClickListener(this);
-                    text.setPadding(10, 4, 10, 4);
+                    text.setPadding(20, 10, 20, 10);
                     ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) text.getLayoutParams();
                     mlp.setMargins(10, 0, 10, 0);
                     text.setBackground(getResources().getDrawable(R.drawable.shape));

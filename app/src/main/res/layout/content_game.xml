@@ -41,7 +41,8 @@
         android:background="@drawable/shape"
         android:layout_marginBottom="29dp"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:textSize="16dp"/>
     <LinearLayout
         android:id="@+id/authorsLayout"
         android:layout_width="wrap_content"
@@ -49,7 +50,6 @@
         android:layout_below="@+id/nextButton"
         android:layout_centerHorizontal="true"
         android:orientation="vertical"
-        android:textSize="15sp"
         android:padding="7dp"/>
    <Button
         android:id="@+id/nextButton"

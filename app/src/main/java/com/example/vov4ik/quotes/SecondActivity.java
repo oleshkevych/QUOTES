@@ -244,7 +244,8 @@ public class SecondActivity extends AppCompatActivity {
                     text.setId(Arrays.asList(savedTags).indexOf(savedTag));
                     ((LinearLayout) linearLayout).addView(text);
                     text.setOnClickListener(this);
-                    text.setPadding(10, 4, 10, 4);
+                    text.setPadding(20, 10, 20, 10);
+                    text.setTextSize(16);
                     ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) text.getLayoutParams();
                     mlp.setMargins(10, 0, 10, 0);
                     text.setBackground(getResources().getDrawable(R.drawable.shape));
